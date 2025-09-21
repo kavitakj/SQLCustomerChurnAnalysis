@@ -15,7 +15,7 @@ https://www.kaggle.com/datasets/blastchar/telco-customer-churn
 - **Churn Risk** is significantly higher among month-to-month contract users and fiber optic internet subscribers.
 - **Tech Support** availability reduces churn, making it a potential retention driver.
 - **Lifetime Value LTV** is highest for customers on annual contracts.
-- ** Bundled Services** increase average revenue per user (ARPU) and could be a target for upsell opportunities.
+- **Bundled Services** increase average revenue per user (ARPU) and could be a target for upsell opportunities.
 - **Gender-based Upsell Analysis** shows variation in the adoption of security and backup services.
 
 ## Business Recommendations
