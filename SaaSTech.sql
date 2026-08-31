@@ -98,10 +98,20 @@ join customercount as cc
 on cc.techsupport = cs.techsupport
 order by churnratio desc;
 
--- retention rate = 1-churn rate
+-- metric definition: retention rate = 1-churn rate
 -- How does churn rate vary across customer tenure brackets?
 -- Detect lifecycle churn patterns (e.g., early churn) to inform
 -- onboarding, engagement, or loyalty campaigns
+-- automatically save monthly data updates without manual work
+CREATE TABLE IF NOT EXISTS monthly_retention_summary (
+report_date DATE,
+tenure_bucket VARCHAR(10),
+retention_rate DECIMAL(5,2) );
+
+DELIMITER //
+CREATE PROCEDURE generate_retention_report()
+BEGIN 
+
 with churnandtenure as(
 select
 case when tenure <= 6 then '0-6m'
@@ -115,9 +125,20 @@ count(customerid) as totalcustomers
 from customers
 group by tenurebuckets)
 
-select *, round((1-churnedcustomers/totalcustomers),2) as retentionrate
-from churnandtenure
-order by retentionrate desc;
+select date_format(current_date(), '%Y-%m-01'), tenurebuckets,
+round((1.0 - (churnedcustomers / nullif(totalcustomers, 0))), 2) as retentionrate
+from churnandtenure;
+
+END //
+
+DELIMITER ;
+create EVENT IF NOT EXISTS monthly 
+ON schedule every 1 month
+starts (last_day(current_date) + interval 1 day + interval 0 second)
+do 
+call generate_retention_report();
+
+select * from monthly_retention_summary order by report_date desc;
 
 -- What are the month-over-month retention trends?
 -- How can we visualize churn risk over time?
